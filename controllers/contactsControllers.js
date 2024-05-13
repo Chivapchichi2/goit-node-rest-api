@@ -1,6 +1,7 @@
 import * as contactsService from "../services/contactsServices.js";
 import ctrlWrapper from "../decorators/ctrlWrapper.js";
 import HttpError from "../helpers/HttpError.js";
+import { updateContactById } from "../services/contactsServices.js";
 
 const getAllContacts = async (req, res) => {
   const result = await contactsService.listContacts();
@@ -12,7 +13,7 @@ const getOneContact = async (req, res) => {
   const { id } = req.params;
   const result = await contactsService.getContactById(id);
   if (!result) {
-    throw HttpError(404, "Not found");
+    throw HttpError(404);
   }
 
   res.json(result);
@@ -22,7 +23,7 @@ const deleteContact = async (req, res) => {
   const { id } = req.params;
   const result = await contactsService.removeContact(id);
   if (!result) {
-    throw HttpError(404, "Not found");
+    throw HttpError(404);
   }
 
   res.json(result);
@@ -38,7 +39,7 @@ const updateContact = async (req, res) => {
   const { id } = req.params;
   const result = await contactsService.updateContactById(id, req.body);
   if (!result) {
-    throw HttpError(404, "Not found");
+    throw HttpError(404);
   }
 
   res.json(result);
