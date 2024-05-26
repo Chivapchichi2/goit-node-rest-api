@@ -13,6 +13,7 @@ import {
   userSubscriptionSchema,
 } from "../schemas/authSchemas.js";
 import isValidId from "../middlewares/isValidId.js";
+import upload from "../middlewares/upload.js";
 
 const authRouter = express.Router();
 
@@ -41,6 +42,13 @@ authRouter.patch(
   isEmptyBody,
   validateBody(userSubscriptionSchema),
   authControllers.updateSubscription,
+);
+
+authRouter.post(
+  "/avatars",
+  authenticate,
+  upload.single("avatar"),
+  authControllers.updateAvatar,
 );
 
 export default authRouter;

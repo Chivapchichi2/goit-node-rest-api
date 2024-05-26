@@ -1,3 +1,6 @@
+import path from "path";
+import fs from "fs/promises";
+import jimp from "jimp";
 import * as authServices from "../services/authServices.js";
 
 import ctrlWrapper from "../decorators/ctrlWrapper.js";
@@ -5,6 +8,8 @@ import ctrlWrapper from "../decorators/ctrlWrapper.js";
 import HttpError from "../helpers/HttpError.js";
 import compareHash from "../helpers/compareHash.js";
 import { createToken } from "../helpers/jwt.js";
+
+const avatarsPath = path.resolve("public", "avatars");
 
 const signup = async (req, res) => {
   const { email } = req.body;
@@ -19,6 +24,7 @@ const signup = async (req, res) => {
     user: {
       email: newUser.email,
       subscription: newUser.subscription,
+      avatarURL: newUser.avatarURL,
     },
   });
 };
@@ -51,11 +57,12 @@ const signin = async (req, res) => {
 };
 
 const getCurrent = (req, res) => {
-  const { subscription, email } = req.user;
+  const { subscription, email, avatarURL } = req.user;
 
   res.json({
     email,
     subscription,
+    avatarURL,
   });
 };
 
@@ -77,10 +84,29 @@ const updateSubscription = async (req, res) => {
   });
 };
 
+const updateAvatar = async (req, res) => {
+  const { _id } = req.user;
+  const { path: oldPath, filename } = req.file;
+  const image = await jimp.read(oldPath);
+  await image.scaleToFit(250, 250);
+
+  const newPath = path.join(avatarsPath, filename);
+  await image.writeAsync(newPath);
+  await fs.unlink(oldPath);
+  const avatarURL = path.join("avatars", filename);
+  const user = await authServices.updateUser({ _id }, { avatarURL });
+
+  res.json({
+    email: user.email,
+    avatarURL: user.avatarURL,
+  });
+};
+
 export default {
   signup: ctrlWrapper(signup),
   signin: ctrlWrapper(signin),
   getCurrent: ctrlWrapper(getCurrent),
   signout: ctrlWrapper(signout),
   updateSubscription: ctrlWrapper(updateSubscription),
+  updateAvatar: ctrlWrapper(updateAvatar),
 };
