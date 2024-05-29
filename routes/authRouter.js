@@ -11,6 +11,7 @@ import {
   authSignupSchema,
   authSigninSchema,
   userSubscriptionSchema,
+  authEmailSchema,
 } from "../schemas/authSchemas.js";
 import isValidId from "../middlewares/isValidId.js";
 import upload from "../middlewares/upload.js";
@@ -22,6 +23,15 @@ authRouter.post(
   isEmptyBody,
   validateBody(authSignupSchema),
   authControllers.signup,
+);
+
+authRouter.get("/verify/:verificationToken", authControllers.verify);
+
+authRouter.post(
+  "/verify",
+  isEmptyBody,
+  validateBody(authEmailSchema),
+  authControllers.resendVerify,
 );
 
 authRouter.post(
