@@ -14,6 +14,7 @@ import {
 } from "../schemas/authSchemas.js";
 import isValidId from "../middlewares/isValidId.js";
 import upload from "../middlewares/upload.js";
+import isFilePresent from "../middlewares/isFilePresent.js";
 
 const authRouter = express.Router();
 
@@ -36,19 +37,20 @@ authRouter.get("/current", authenticate, authControllers.getCurrent);
 authRouter.post("/logout", authenticate, authControllers.signout);
 
 authRouter.patch(
+  "/avatars",
+  authenticate,
+  upload.single("avatar"),
+  isFilePresent,
+  authControllers.updateAvatar,
+);
+
+authRouter.patch(
   "/:id",
   authenticate,
   isValidId,
   isEmptyBody,
   validateBody(userSubscriptionSchema),
   authControllers.updateSubscription,
-);
-
-authRouter.post(
-  "/avatars",
-  authenticate,
-  upload.single("avatar"),
-  authControllers.updateAvatar,
 );
 
 export default authRouter;
