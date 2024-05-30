@@ -149,7 +149,7 @@ const updateAvatar = async (req, res) => {
   const { _id } = req.user;
   const { path: oldPath, filename } = req.file;
   const image = await jimp.read(oldPath);
-  await image.scaleToFit(250, 250);
+  await image.resize(250, 250);
 
   const newPath = path.join(avatarsPath, filename);
   await image.writeAsync(newPath);
@@ -158,7 +158,6 @@ const updateAvatar = async (req, res) => {
   const user = await authServices.updateUser({ _id }, { avatarURL });
 
   res.json({
-    email: user.email,
     avatarURL: user.avatarURL,
   });
 };
